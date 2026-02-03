@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Alex Dev - Creative Engineer</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00aaff",
+                        "primary-glow": "rgba(0, 170, 255, 0.5)",
+                        "secondary": "#8D4DFF",
+                        "background-dark": "#0B1114", 
+                        "surface-dark": "rgba(20, 25, 30, 0.7)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    backgroundImage: {
+                        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%)',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 25px rgba(0, 170, 255, 0.2)',
+                        'glow-hover': '0 0 40px rgba(0, 170, 255, 0.4)',
+                    }
+                },
+            },
+        }
+    </script>
+    
+    <style>
+        /* Base Polish */
+        body {
+            background-color: #0B1114;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+        }
+
+        /* Noise Texture for Realism */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.03;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Advanced Glassmorphism */
+        .glass-panel {
+            background: rgba(20, 25, 30, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15); /* Top highlight */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-nav {
+            background: rgba(11, 17, 20, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #00aaff 0%, #8D4DFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Utility Classes */
+        .reveal-text {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+        
+        .char {
+            display: inline-block; /* For GSAP char animation */
+        }
+    </style>
+</head>
+<body class="text-white font-display selection:bg-primary selection:text-white antialiased">
+
+    <div class="noise-overlay"></div>
+
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] ambient-float-slow"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[700px] h-[700px] bg-secondary/10 rounded-full blur-[120px] ambient-float-reverse"></div>
+    </div>
+
+    <nav class="fixed top-0 w-full z-50 glass-nav transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg group-hover:shadow-glow transition-all duration-300">
+                    <span class="material-symbols-outlined text-white text-lg font-bold">code</span>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-white group-hover:text-primary transition-colors">Alex Dev</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full" href="#about">About</a>
+                <a class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full" href="#skills">Skills</a>
+                <a class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full" href="#projects">Projects</a>
+                <a class="nav-link text-sm font-medium text-gray-300 hover:text-white transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full" href="#experience">Experience</a>
+                
+                <a class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-primary hover:border-primary hover:shadow-glow transition-all duration-300 group" href="#contact">
+                    <span class="text-sm font-bold group-hover:text-white">Let's Talk</span>
+                    <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </a>
+            </div>
+
+            <button class="md:hidden w-10 h-10 flex items-center justify-center text-white z-50 relative" id="mobile-toggle">
+                <span class="material-symbols-outlined text-3xl" id="menu-icon">menu</span>
+            </button>
+        </div>
+
+        <div class="fixed inset-0 bg-background-dark/95 backdrop-blur-xl z-40 transform translate-x-full transition-transform duration-500 flex flex-col items-center justify-center gap-8 md:hidden" id="mobile-menu">
+            <a class="mobile-link text-2xl font-bold text-white" href="#about">About</a>
+            <a class="mobile-link text-2xl font-bold text-white" href="#skills">Skills</a>
+            <a class="mobile-link text-2xl font-bold text-white" href="#projects">Projects</a>
+            <a class="mobile-link text-2xl font-bold text-white" href="#experience">Experience</a>
+            <a class="mobile-link text-2xl font-bold text-primary" href="#contact">Contact Me</a>
+        </div>
+    </nav>
+
+    <header class="relative min-h-screen flex items-center justify-center pt-20 z-10 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12 w-full grid lg:grid-cols-2 gap-12 items-center">
+            
+            <div class="flex flex-col gap-6 lg:gap-8 hero-content">
+                <div class="hero-stagger opacity-0 translate-y-8 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 w-fit backdrop-blur-md">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <span class="text-xs font-medium text-gray-300 tracking-wide uppercase">Available for hire</span>
+                </div>
+                
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-tighter">
+                    <span class="block text-white hero-stagger opacity-0 translate-y-12">Hello, I'm</span>
+                    <span class="block text-gradient mt-2 pb-2 hero-stagger opacity-0 translate-y-12">Alex Dev</span>
+                </h1>
+                
+                <h2 class="text-xl md:text-2xl text-gray-400 font-light max-w-xl leading-relaxed hero-stagger opacity-0 translate-y-8">
+                    Architecting <span class="text-white font-medium">AI-Driven Experiences</span> and building the future of web interaction.
+                </h2>
+                
+                <div class="flex flex-wrap gap-4 mt-4 hero-stagger opacity-0 translate-y-8">
+                    <a class="px-8 py-4 rounded-xl bg-primary text-white font-bold text-sm tracking-wide shadow-glow hover:shadow-glow-hover transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-1" href="#projects">
+                        View Projects
+                        <span class="material-symbols-outlined text-lg">layers</span>
+                    </a>
+                    <a class="px-8 py-4 rounded-xl glass-panel text-white font-bold text-sm tracking-wide hover:bg-white/10 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-1" href="#contact">
+                        Contact Me
+                        <span class="material-symbols-outlined text-lg">mail</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="relative hidden lg:block h-full min-h-[600px] perspective-container">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div id="hero-card" class="relative w-[400px] h-[520px] bg-gradient-to-b from-gray-800 to-black rounded-[2rem] border border-white/10 overflow-hidden shadow-2xl glass-panel z-10 cursor-pointer transition-transform duration-100 ease-out will-change-transform">
+                        
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center opacity-60 mix-blend-overlay transition-transform duration-700 hover:scale-110"></div>
+                        
+                        <div class="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black via-black/90 to-transparent">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-primary font-mono mb-2 tracking-wider">LATEST DEPLOYMENT</p>
+                                    <p class="text-xl font-bold text-white">Neural Interface UI</p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-white/10 border border-white/10 flex items-center justify-center backdrop-blur-md group hover:bg-primary hover:border-primary transition-all duration-300">
+                                    <span class="material-symbols-outlined text-white group-hover:rotate-45 transition-transform">arrow_outward</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="absolute top-10 right-10 w-[300px] h-[400px] bg-secondary/10 border border-white/5 rounded-[2rem] transform rotate-[6deg] -z-10 backdrop-blur-sm animate-pulse"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/30 cursor-pointer" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+            <span class="material-symbols-outlined text-3xl">keyboard_arrow_down</span>
+        </div>
+    </header>
+
+    <section class="relative py-32 z-10" id="about">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex flex-col lg:flex-row gap-16 items-center">
+                
+                <div class="flex-1 relative group w-full max-w-md mx-auto lg:mx-0 gsap-reveal-left">
+                    <div class="aspect-[4/5] rounded-3xl overflow-hidden relative border border-white/10">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-primary/30 to-secondary/30 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-700"></div>
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" 
+                             alt="Portrait of Alex Dev" 
+                             class="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />
+                    </div>
+                    <div class="absolute -bottom-6 -right-6 w-36 h-36 glass-panel rounded-full flex flex-col items-center justify-center z-20 hover:scale-110 transition-transform duration-300 border border-white/20">
+                        <span class="block text-4xl font-black text-white">5+</span>
+                        <span class="text-xs text-primary font-bold uppercase tracking-widest mt-1">Years Exp.</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col gap-8 relative gsap-reveal-right">
+                    <div class="space-y-4">
+                        <span class="text-primary font-mono text-sm tracking-widest uppercase border-l-2 border-primary pl-3">About Me</span>
+                        <h2 class="text-4xl md:text-5xl font-bold text-white leading-tight">
+                            Engineering the <br/><span class="text-gray-600">Digital Future.</span>
+                        </h2>
+                    </div>
+                    <p class="text-lg text-gray-400 leading-relaxed">
+                        I specialize in building scalable AI-driven applications and immersive web experiences. My approach combines technical precision with a passion for futuristic design aesthetics. I don't just write code; I craft digital ecosystems that breathe.
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+                        <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 transition-colors">
+                            <div class="flex items-center gap-3 text-white font-bold mb-2">
+                                <span class="material-symbols-outlined text-primary">rocket_launch</span>
+                                <span>Performance First</span>
+                            </div>
+                            <p class="text-sm text-gray-500">Optimized for speed, SEO, and efficiency across all devices.</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-secondary/30 transition-colors">
+                            <div class="flex items-center gap-3 text-white font-bold mb-2">
+                                <span class="material-symbols-outlined text-secondary">psychology</span>
+                                <span>AI Integration</span>
+                            </div>
+                            <p class="text-sm text-gray-500">Seamlessly blending machine learning models into UI.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-24 z-10" id="skills">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-secondary/5 rounded-full blur-[100px] -z-10"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="text-center mb-16">
+                <span class="text-primary font-mono text-sm tracking-widest uppercase">Expertise</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mt-2">Technical Arsenal</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="skills-grid">
+                <div class="glass-panel p-8 rounded-2xl hover:translate-y-[-5px] transition-transform duration-300 group skill-card opacity-0 translate-y-8">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors border border-primary/20">
+                        <span class="material-symbols-outlined text-primary text-3xl">html</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Frontend</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-primary"></span>React / Next.js</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-primary"></span>Tailwind CSS</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-primary"></span>Three.js / WebGL</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-primary"></span>TypeScript</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl hover:translate-y-[-5px] transition-transform duration-300 group skill-card opacity-0 translate-y-8">
+                    <div class="w-14 h-14 rounded-xl bg-secondary/10 flex items-center justify-center mb-6 group-hover:bg-secondary/20 transition-colors border border-secondary/20">
+                        <span class="material-symbols-outlined text-secondary text-3xl">dns</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Backend</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-secondary"></span>Node.js / Express</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-secondary"></span>Python / Django</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-secondary"></span>PostgreSQL</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-secondary"></span>GraphQL</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl hover:translate-y-[-5px] transition-transform duration-300 group skill-card opacity-0 translate-y-8">
+                    <div class="w-14 h-14 rounded-xl bg-pink-500/10 flex items-center justify-center mb-6 group-hover:bg-pink-500/20 transition-colors border border-pink-500/20">
+                        <span class="material-symbols-outlined text-pink-500 text-3xl">smart_toy</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">AI / ML</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-pink-500"></span>PyTorch</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-pink-500"></span>TensorFlow</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-pink-500"></span>LangChain</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-pink-500"></span>OpenAI API</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl hover:translate-y-[-5px] transition-transform duration-300 group skill-card opacity-0 translate-y-8">
+                    <div class="w-14 h-14 rounded-xl bg-yellow-500/10 flex items-center justify-center mb-6 group-hover:bg-yellow-500/20 transition-colors border border-yellow-500/20">
+                        <span class="material-symbols-outlined text-yellow-500 text-3xl">build</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-4">Tools</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-yellow-500"></span>Docker / K8s</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-yellow-500"></span>AWS / Azure</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-yellow-500"></span>Git / CI/CD</li>
+                        <li class="flex items-center gap-3 text-gray-400 text-sm"><span class="w-2 h-2 rounded-full bg-yellow-500"></span>Figma</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-32 z-10" id="projects">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+                <div>
+                    <span class="text-primary font-mono text-sm tracking-widest uppercase">Portfolio</span>
+                    <h2 class="text-4xl font-bold text-white mt-2">Selected Works</h2>
+                </div>
+                <a class="text-sm font-bold text-gray-400 hover:text-white flex items-center gap-2 transition-colors border-b border-transparent hover:border-white pb-1" href="#">
+                    View GitHub
+                    <span class="material-symbols-outlined text-sm">arrow_outward</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12" id="projects-grid">
+                
+                <div class="project-card group relative rounded-2xl overflow-hidden glass-panel border-0 md:col-span-2 lg:col-span-1 h-[400px] lg:h-[500px] opacity-0 translate-y-8">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Financial Dashboard" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-40" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/90 to-transparent flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <div class="flex gap-2 mb-3">
+                            <span class="px-2 py-1 rounded bg-primary/20 text-primary text-xs font-bold border border-primary/20">Next.js</span>
+                            <span class="px-2 py-1 rounded bg-white/10 text-white text-xs font-bold border border-white/10">FinTech</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">QuantAI Analytics</h3>
+                        <p class="text-gray-400 text-sm max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 h-0 group-hover:h-auto overflow-hidden">
+                            Real-time financial forecasting platform powered by machine learning algorithms, processing over 1M data points per second.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative rounded-2xl overflow-hidden glass-panel border-0 h-[400px] lg:mt-12 opacity-0 translate-y-8">
+                    <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Abstract Neon Art" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-40" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/90 to-transparent flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <div class="flex gap-2 mb-3">
+                            <span class="px-2 py-1 rounded bg-secondary/20 text-secondary text-xs font-bold border border-secondary/20">Three.js</span>
+                            <span class="px-2 py-1 rounded bg-white/10 text-white text-xs font-bold border border-white/10">WebGL</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Neon Verse</h3>
+                        <p class="text-gray-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 h-0 group-hover:h-auto overflow-hidden">
+                            An immersive 3D web experience exploring the boundaries of browser-based graphics rendering.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative rounded-2xl overflow-hidden glass-panel border-0 h-[400px] opacity-0 translate-y-8">
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Code Editor" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-40" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/90 to-transparent flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <div class="flex gap-2 mb-3">
+                            <span class="px-2 py-1 rounded bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/20">Python</span>
+                            <span class="px-2 py-1 rounded bg-white/10 text-white text-xs font-bold border border-white/10">LLM</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">CodeSynth</h3>
+                        <p class="text-gray-400 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 h-0 group-hover:h-auto overflow-hidden">
+                            AI-powered code completion tool designed for specialized legacy banking systems.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative rounded-2xl overflow-hidden glass-panel border-0 md:col-span-2 lg:col-span-1 h-[400px] lg:h-[500px] lg:-mt-12 opacity-0 translate-y-8">
+                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Mobile Health App" 
+                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-40" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/90 to-transparent flex flex-col justify-end p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                        <div class="flex gap-2 mb-3">
+                            <span class="px-2 py-1 rounded bg-primary/20 text-primary text-xs font-bold border border-primary/20">React Native</span>
+                            <span class="px-2 py-1 rounded bg-white/10 text-white text-xs font-bold border border-white/10">Health</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Vitality App</h3>
+                        <p class="text-gray-400 text-sm max-w-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 h-0 group-hover:h-auto overflow-hidden">
+                            Cross-platform mobile application for tracking biometrics with seamless wearable integration.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="relative py-24 z-10" id="experience">
+        <div class="max-w-4xl mx-auto px-6 lg:px-12">
+            <div class="text-center mb-16">
+                <span class="text-primary font-mono text-sm tracking-widest uppercase">Career Path</span>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mt-2">Professional Journey</h2>
+            </div>
+            
+            <div class="relative">
+                <div class="absolute left-8 lg:left-1/2 top-0 bottom-0 w-px bg-white/10"></div>
+                <div class="absolute left-8 lg:left-1/2 top-0 w-px bg-gradient-to-b from-primary via-secondary to-transparent" id="timeline-line"></div>
+
+                <div class="space-y-12">
+                    <div class="timeline-item relative flex flex-col lg:flex-row gap-8 items-start lg:items-center opacity-0 translate-y-8">
+                        <div class="lg:w-1/2 lg:text-right order-2 lg:order-1 pl-20 lg:pl-0 lg:pr-12">
+                            <h3 class="text-xl font-bold text-white">Senior Frontend Engineer</h3>
+                            <p class="text-primary font-mono text-sm mb-2">TechFlow Systems • 2023 - Present</p>
+                            <p class="text-gray-400 text-sm">Leading the frontend architecture for a SaaS platform serving 50k+ users. Migrated legacy codebase to Next.js.</p>
+                        </div>
+                        <div class="absolute left-8 lg:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-background-dark border-2 border-primary shadow-[0_0_10px_#00aaff] z-10 order-1 lg:order-2 mt-1 lg:mt-0 ring-4 ring-background-dark"></div>
+                        <div class="hidden lg:block lg:w-1/2 order-3"></div>
+                    </div>
+
+                    <div class="timeline-item relative flex flex-col lg:flex-row gap-8 items-start lg:items-center opacity-0 translate-y-8">
+                        <div class="hidden lg:block lg:w-1/2 order-1"></div>
+                        <div class="absolute left-8 lg:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-background-dark border-2 border-secondary shadow-[0_0_10px_#8D4DFF] z-10 mt-1 lg:mt-0 ring-4 ring-background-dark"></div>
+                        <div class="lg:w-1/2 pl-20 lg:pl-12 order-2">
+                            <h3 class="text-xl font-bold text-white">Full Stack Developer</h3>
+                            <p class="text-secondary font-mono text-sm mb-2">Creative Pulse Agency • 2021 - 2023</p>
+                            <p class="text-gray-400 text-sm">Developed award-winning marketing sites and internal tools. Specialized in WebGL interactions and CMS integrations.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item relative flex flex-col lg:flex-row gap-8 items-start lg:items-center opacity-0 translate-y-8">
+                        <div class="lg:w-1/2 lg:text-right order-2 lg:order-1 pl-20 lg:pl-0 lg:pr-12">
+                            <h3 class="text-xl font-bold text-white">Junior Developer</h3>
+                            <p class="text-gray-500 font-mono text-sm mb-2">Startup Inc • 2019 - 2021</p>
+                            <p class="text-gray-400 text-sm">Collaborated with design teams to implement responsive UIs. Gained deep experience in React ecosystem.</p>
+                        </div>
+                        <div class="absolute left-8 lg:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-background-dark border-2 border-gray-600 z-10 order-1 lg:order-2 mt-1 lg:mt-0 ring-4 ring-background-dark"></div>
+                        <div class="hidden lg:block lg:w-1/2 order-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="relative pt-24 pb-12 z-10" id="contact">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="glass-panel rounded-3xl p-8 lg:p-16 relative overflow-hidden shadow-2xl">
+                <div class="absolute top-0 right-0 w-80 h-80 bg-primary/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none animate-pulse"></div>
+                
+                <div class="grid lg:grid-cols-2 gap-16">
+                    <div>
+                        <h2 class="text-4xl font-bold text-white mb-6">Let's build something <br/>extraordinary together.</h2>
+                        <p class="text-gray-400 mb-8 max-w-md">I'm currently available for freelance projects and open to full-time opportunities. If you have an idea, I have the stack.</p>
+                        
+                        <div class="space-y-4">
+                            <a href="mailto:hello@alexdev.com" class="flex items-center gap-4 text-white hover:text-primary transition-colors group">
+                                <div class="w-12 h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center group-hover:bg-primary/20 group-hover:border-primary/20 transition-all">
+                                    <span class="material-symbols-outlined">mail</span>
+                                </div>
+                                <span class="font-medium">hello@alexdev.com</span>
+                            </a>
+                            <div class="flex items-center gap-4 text-white">
+                                <div class="w-12 h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center">
+                                    <span class="material-symbols-outlined">location_on</span>
+                                </div>
+                                <span class="font-medium">San Francisco, CA (Remote)</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 mt-12">
+                            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white hover:bg-primary hover:text-white hover:shadow-glow hover:-translate-y-1 transition-all duration-300">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-full bg-white/5 border border-white/5 flex items-center justify-center text-white hover:bg-primary hover:text-white hover:shadow-glow hover:-translate-y-1 transition-all duration-300">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <form class="space-y-6">
+                        <div class="relative group">
+                            <input type="text" id="name" class="peer w-full bg-transparent border-0 border-b border-gray-700 py-3 text-white focus:border-primary focus:ring-0 transition-colors placeholder-transparent" placeholder="Name" />
+                            <label for="name" class="absolute left-0 -top-3.5 text-sm text-primary transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-primary">Your Name</label>
+                        </div>
+                        <div class="relative group">
+                            <input type="email" id="email" class="peer w-full bg-transparent border-0 border-b border-gray-700 py-3 text-white focus:border-primary focus:ring-0 transition-colors placeholder-transparent" placeholder="Email" />
+                            <label for="email" class="absolute left-0 -top-3.5 text-sm text-primary transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-primary">Email Address</label>
+                        </div>
+                        <div class="relative group">
+                            <textarea id="message" rows="4" class="peer w-full bg-transparent border-0 border-b border-gray-700 py-3 text-white focus:border-primary focus:ring-0 transition-colors placeholder-transparent resize-none" placeholder="Message"></textarea>
+                            <label for="message" class="absolute left-0 -top-3.5 text-sm text-primary transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-primary">Message</label>
+                        </div>
+                        <button type="button" class="mt-4 px-8 py-4 w-full rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold text-sm tracking-wide shadow-glow hover:shadow-glow-hover transition-all duration-300 transform hover:-translate-y-1">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-16 border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+                <p>&copy; 2025 Alex Dev. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Register GSAP Plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- 1. Mobile Menu Logic ---
+        const btn = document.getElementById('mobile-toggle');
+        const menu = document.getElementById('mobile-menu');
+        const icon = document.getElementById('menu-icon');
+        const links = document.querySelectorAll('.mobile-link');
+        let isMenuOpen = false;
+
+        btn.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                menu.classList.remove('translate-x-full');
+                icon.innerText = 'close';
+                document.body.style.overflow = 'hidden';
+            } else {
+                menu.classList.add('translate-x-full');
+                icon.innerText = 'menu';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                isMenuOpen = false;
+                menu.classList.add('translate-x-full');
+                icon.innerText = 'menu';
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // --- 2. Advanced GSAP Animations ---
+
+        // Hero Stagger Effect
+        gsap.to(".hero-stagger", {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.15,
+            ease: "power3.out",
+            delay: 0.2
+        });
+
+        // About Image Reveal
+        gsap.from(".gsap-reveal-left", {
+            scrollTrigger: {
+                trigger: "#about",
+                start: "top 80%",
+            },
+            x: -50,
+            opacity: 0,
+            duration: 1.2,
+            ease: "power3.out"
+        });
+
+        gsap.from(".gsap-reveal-right", {
+            scrollTrigger: {
+                trigger: "#about",
+                start: "top 80%",
+            },
+            x: 50,
+            opacity: 0,
+            duration: 1.2,
+            ease: "power3.out",
+            delay: 0.2
+        });
+
+        // Skills Stagger Grid
+        gsap.to(".skill-card", {
+            scrollTrigger: {
+                trigger: "#skills-grid",
+                start: "top 85%",
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "back.out(1.7)"
+        });
+
+        // Projects Stagger
+        gsap.to(".project-card", {
+            scrollTrigger: {
+                trigger: "#projects-grid",
+                start: "top 80%",
+            },
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.2,
+            ease: "power3.out"
+        });
+
+        // Experience Timeline Drawing
+        gsap.to("#timeline-line", {
+            scrollTrigger: {
+                trigger: "#experience",
+                start: "top 70%",
+                end: "bottom 80%",
+                scrub: 1, // Links animation to scroll position
+            },
+            height: "100%",
+            ease: "none"
+        });
+
+        gsap.to(".timeline-item", {
+            scrollTrigger: {
+                trigger: "#experience",
+                start: "top 75%",
+            },
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.3,
+            ease: "power2.out"
+        });
+
+        // --- 3. Hero Card 3D Parallax Effect ---
+        const card = document.getElementById('hero-card');
+        const container = document.querySelector('.perspective-container');
+
+        if(container && card) {
+            container.addEventListener('mousemove', (e) => {
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Calculate rotation (limit to +/- 15 deg)
+                const xPct = (x / rect.width) - 0.5;
+                const yPct = (y / rect.height) - 0.5;
+                
+                const rotateY = xPct * 20; // Rotate around Y axis based on X mouse position
+                const rotateX = yPct * -20; // Rotate around X axis based on Y mouse position
+
+                gsap.to(card, {
+                    rotationY: rotateY,
+                    rotationX: rotateX,
+                    duration: 0.5,
+                    ease: "power2.out",
+                    transformPerspective: 1000,
+                    transformStyle: "preserve-3d"
+                });
+            });
+
+            container.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    rotationY: 0,
+                    rotationX: 0,
+                    duration: 1,
+                    ease: "elastic.out(1, 0.5)"
+                });
+            });
+        }
+    </script>
+</body>
+</html>
+
+```

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>NEXUS_OS | Neural Portfolio</title>
+    
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#47cfeb",
+                        "secondary": "#B266E5",
+                        "background-dark": "#0B0E14",
+                        "surface": "#151921",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "mono": ["Space Mono", "monospace"],
+                    },
+                    backgroundImage: {
+                        'hero-glow': 'radial-gradient(circle at center, rgba(71, 207, 235, 0.12) 0%, rgba(18, 22, 33, 0) 70%)',
+                        'grid-pattern': `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm1 1h38v38H1V1z' fill='%2347cfeb' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+                    },
+                    animation: {
+                        'spin-slow': 'spin 20s linear infinite',
+                        'spin-reverse-slow': 'spin 25s linear infinite reverse',
+                        'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 0.4 },
+                            '50%': { opacity: 0.8 },
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* CSS Utilities */
+        body {
+            cursor: none; /* Hide default cursor for custom one */
+        }
+        
+        /* Custom Scrollbar for horizontal section */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Neon & Glow Effects */
+        .neon-text {
+            text-shadow: 0 0 30px rgba(71, 207, 235, 0.4);
+        }
+
+        /* Scanline Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.1) 50%,
+                rgba(0,0,0,0.1)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        /* Custom Cursor */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #47cfeb;
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(71, 207, 235, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+
+        /* Scroll Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Glitch Animation for Contact Button */
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        .glitch-hover:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #47cfeb;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-white font-display overflow-x-hidden selection:bg-primary/30 antialiased">
+
+    <div class="scanlines"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-center">
+        <div class="glass-panel rounded-full px-6 py-3 flex items-center justify-between gap-12 max-w-4xl w-full shadow-[0_4px_30px_rgba(0,0,0,0.5)] bg-[#0B0E14]/60">
+            
+            <a href="#" class="flex items-center gap-2 text-primary group" onmouseenter="startScramble(this)" data-value="NEXUS_OS">
+                <span class="material-symbols-outlined text-[20px] group-hover:rotate-180 transition-transform duration-700">hub</span>
+                <span class="font-bold tracking-wider text-sm scramble-text">NEXUS_OS</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a class="text-xs font-mono text-gray-400 hover:text-primary transition-colors tracking-widest hover:shadow-[0_0_10px_rgba(71,207,235,0.4)]" href="#">_HOME</a>
+                <a class="text-xs font-mono text-gray-400 hover:text-primary transition-colors tracking-widest hover:shadow-[0_0_10px_rgba(71,207,235,0.4)]" href="#modules">_MODULES</a>
+                <a class="text-xs font-mono text-gray-400 hover:text-primary transition-colors tracking-widest hover:shadow-[0_0_10px_rgba(71,207,235,0.4)]" href="#skills">_CAPABILITIES</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button onclick="toggleContact()" class="bg-primary/10 hover:bg-primary hover:text-background-dark border border-primary/30 text-primary px-4 py-1.5 rounded text-xs font-mono font-bold transition-all duration-300">
+                    INIT_CONTACT
+                </button>
+                <button class="md:hidden text-white hover:text-primary" onclick="toggleMobileMenu()">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="absolute top-20 left-6 right-6 glass-panel rounded-2xl p-6 flex-col gap-4 hidden md:hidden bg-[#0B0E14]/90 z-50 transform origin-top transition-all">
+            <a class="text-sm font-mono text-gray-300 hover:text-primary py-2 border-b border-white/5" href="#" onclick="toggleMobileMenu()">> _HOME</a>
+            <a class="text-sm font-mono text-gray-300 hover:text-primary py-2 border-b border-white/5" href="#modules" onclick="toggleMobileMenu()">> _MODULES</a>
+            <a class="text-sm font-mono text-gray-300 hover:text-primary py-2" href="#skills" onclick="toggleMobileMenu()">> _CAPABILITIES</a>
+        </div>
+    </nav>
+
+    <header class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 pt-20">
+        
+        <div class="absolute inset-0 bg-hero-glow pointer-events-none z-0"></div>
+        <div class="absolute inset-0 bg-grid-pattern opacity-30 z-0 pointer-events-none"></div>
+        
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-primary/10 z-0 opacity-40 animate-spin-slow"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] rounded-full border border-secondary/20 z-0 opacity-30 rotate-45 animate-spin-reverse-slow"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-primary/30 z-0 opacity-20 -rotate-12 animate-pulse-glow"></div>
+        
+        <div class="relative z-10 flex flex-col items-center text-center max-w-4xl gap-6 reveal active">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-[10px] font-mono tracking-[0.2em] mb-4 backdrop-blur-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                SYSTEM V.2.0.25 ONLINE
+            </div>
+            
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-white neon-text mix-blend-screen" onmouseenter="startScramble(this)" data-value="NEURAL ARCHITECT">
+                NEURAL<br/>
+                ARCHITECT
+            </h1>
+            
+            <p class="text-gray-400 font-mono text-sm md:text-base max-w-xl leading-relaxed mt-4">
+                <span class="text-primary animate-pulse">></span> Generative Designer & Developer crafting digital intelligence through neural networks and interactive experiences.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 mt-8">
+                <button onclick="document.getElementById('modules').scrollIntoView()" class="group relative px-8 py-3 bg-primary text-background-dark font-bold font-mono text-sm rounded overflow-hidden shadow-[0_0_20px_rgba(71,207,235,0.3)] hover:shadow-[0_0_40px_rgba(71,207,235,0.6)] transition-shadow duration-300">
+                    <span class="relative z-10">INITIATE SEQUENCE</span>
+                    <div class="absolute inset-0 bg-white/40 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                </button>
+                <button class="px-8 py-3 bg-transparent border border-gray-700 hover:border-primary hover:text-primary font-mono text-sm rounded transition-all duration-300 glitch-hover">
+                    VIEW_LOGS
+                </button>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-10 hidden md:flex flex-col gap-2 text-[10px] font-mono text-gray-600">
+            <span>COORD: 34.0522° N, 118.2437° W</span>
+            <span class="text-green-500">ENV: PRODUCTION // STABLE</span>
+        </div>
+        <div class="absolute bottom-10 right-10 hidden md:block animate-bounce">
+            <span class="material-symbols-outlined text-gray-700 text-4xl">keyboard_arrow_down</span>
+        </div>
+    </header>
+
+    <section class="relative py-24 w-full overflow-hidden border-t border-white/5 bg-background-dark" id="modules">
+        <div class="px-6 md:px-12 lg:px-20 mb-12 flex justify-between items-end reveal">
+            <div>
+                <h2 class="text-xs font-mono text-primary mb-2 tracking-widest">DEPLOYED MODULES</h2>
+                <h3 class="text-3xl font-bold text-white">PROJECT DATABASE</h3>
+            </div>
+            <div class="hidden md:flex gap-2">
+                <div class="h-[1px] w-24 bg-gradient-to-r from-transparent to-primary/50 self-center"></div>
+                <span class="text-[10px] font-mono text-gray-500 animate-pulse">SCROLL_X_AXIS >></span>
+            </div>
+        </div>
+
+        <div class="flex overflow-x-auto no-scrollbar gap-6 px-6 md:px-20 pb-12 snap-x snap-mandatory cursor-grab active:cursor-grabbing">
+            <div class="snap-center shrink-0 w-[85vw] md:w-[600px] glass-panel rounded-xl overflow-hidden group hover:border-primary/50 transition-colors duration-500">
+                <div class="relative h-[320px] w-full bg-surface overflow-hidden">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop');"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-6 left-6 right-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <span class="inline-block px-2 py-1 bg-primary/20 text-primary text-[10px] font-mono rounded mb-2 border border-primary/20">REACT • OPENAI</span>
+                                <h4 class="text-2xl font-bold text-white mb-1">AI Chat Interface</h4>
+                                <p class="text-sm text-gray-400 font-mono">Natural Language Processing Unit</p>
+                            </div>
+                            <button class="bg-white text-black p-3 rounded-full hover:bg-primary hover:scale-110 transition-all duration-300">
+                                <span class="material-symbols-outlined text-sm">arrow_outward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="snap-center shrink-0 w-[85vw] md:w-[600px] glass-panel rounded-xl overflow-hidden group hover:border-secondary/50 transition-colors duration-500">
+                <div class="relative h-[320px] w-full bg-surface overflow-hidden">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=1000&auto=format&fit=crop');"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-6 left-6 right-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <span class="inline-block px-2 py-1 bg-secondary/20 text-secondary text-[10px] font-mono rounded mb-2 border border-secondary/20">VUE • FIREBASE</span>
+                                <h4 class="text-2xl font-bold text-white mb-1">Fintech Dashboard</h4>
+                                <p class="text-sm text-gray-400 font-mono">Real-time Crypto Analytics</p>
+                            </div>
+                            <button class="bg-white text-black p-3 rounded-full hover:bg-secondary hover:scale-110 transition-all duration-300">
+                                <span class="material-symbols-outlined text-sm">arrow_outward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="snap-center shrink-0 w-[85vw] md:w-[600px] glass-panel rounded-xl overflow-hidden group hover:border-purple-400/50 transition-colors duration-500">
+                <div class="relative h-[320px] w-full bg-surface overflow-hidden">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop');"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent opacity-90"></div>
+                    <div class="absolute bottom-6 left-6 right-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <span class="inline-block px-2 py-1 bg-purple-500/20 text-purple-300 text-[10px] font-mono rounded mb-2 border border-purple-500/20">WEBGL • THREE.JS</span>
+                                <h4 class="text-2xl font-bold text-white mb-1">Neural Art Gen</h4>
+                                <p class="text-sm text-gray-400 font-mono">Procedural Generation Engine</p>
+                            </div>
+                            <button class="bg-white text-black p-3 rounded-full hover:bg-purple-400 hover:scale-110 transition-all duration-300">
+                                <span class="material-symbols-outlined text-sm">arrow_outward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 md:px-20 bg-background-dark relative">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-xs font-mono text-primary mb-8 tracking-widest border-b border-primary/20 pb-4 inline-block reveal">EXPERIENCE_LOGS</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-panel p-8 rounded-lg hover:border-primary/50 transition-colors group relative overflow-hidden reveal delay-100 hover:-translate-y-1 duration-300">
+                    <div class="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <span class="material-symbols-outlined text-primary">memory</span>
+                    </div>
+                    <div class="font-mono text-xs text-gray-500 mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        2023 - PRESENT
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Senior Engineer</h3>
+                    <p class="text-primary text-sm font-mono mb-4">@TechCorp_AI</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Leading the development of large language model interfaces. Optimized inference latency by 40% using WebAssembly.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-lg hover:border-secondary/50 transition-colors group relative overflow-hidden reveal delay-200 hover:-translate-y-1 duration-300">
+                    <div class="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <span class="material-symbols-outlined text-secondary">code_blocks</span>
+                    </div>
+                    <div class="font-mono text-xs text-gray-500 mb-4">2021 - 2023</div>
+                    <h3 class="text-xl font-bold text-white mb-1">Creative Dev</h3>
+                    <p class="text-secondary text-sm font-mono mb-4">@Studio_Void</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Crafted award-winning immersive web experiences. Specialized in WebGL shaders and interactive data visualization.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-lg hover:border-white/50 transition-colors group relative overflow-hidden reveal delay-300 hover:-translate-y-1 duration-300">
+                    <div class="absolute top-0 right-0 p-4 opacity-50 group-hover:opacity-100 transition-opacity">
+                        <span class="material-symbols-outlined text-white">polyline</span>
+                    </div>
+                    <div class="font-mono text-xs text-gray-500 mb-4">2019 - 2021</div>
+                    <h3 class="text-xl font-bold text-white mb-1">Frontend Arch</h3>
+                    <p class="text-gray-300 text-sm font-mono mb-4">@StartUp_Inc</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Established the core component library. Migrated legacy monolith to a micro-frontend architecture.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 md:px-20 bg-[#0B0E14] border-t border-white/5" id="skills">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <h2 class="text-3xl font-bold text-white mb-2">SYSTEM CAPABILITIES</h2>
+            <p class="text-gray-500 font-mono text-sm mb-12">INSTALLED KNOWLEDGE PACKAGES</p>
+            
+            <div class="flex flex-wrap justify-center gap-3 md:gap-4">
+                <span class="px-6 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-lg hover:bg-primary/20 cursor-none hover:scale-105 transition-all shadow-[0_0_15px_rgba(71,207,235,0.1)]">React.js</span>
+                <span class="px-6 py-3 rounded-full bg-secondary/10 border border-secondary/20 text-secondary font-bold text-lg hover:bg-secondary/20 cursor-none hover:scale-105 transition-all shadow-[0_0_15px_rgba(178,102,229,0.1)]">Python</span>
+                <span class="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-white/10 cursor-none hover:scale-105 transition-all">TensorFlow</span>
+                
+                <span class="px-5 py-2 rounded-full glass-panel text-gray-300 hover:text-white hover:border-white/30 transition-colors cursor-none">TypeScript</span>
+                <span class="px-5 py-2 rounded-full glass-panel text-gray-300 hover:text-white hover:border-white/30 transition-colors cursor-none">Three.js</span>
+                <span class="px-5 py-2 rounded-full glass-panel text-gray-300 hover:text-white hover:border-white/30 transition-colors cursor-none">Next.js</span>
+                <span class="px-5 py-2 rounded-full glass-panel text-gray-300 hover:text-white hover:border-white/30 transition-colors cursor-none">Tailwind</span>
+                <span class="px-5 py-2 rounded-full glass-panel text-gray-300 hover:text-white hover:border-white/30 transition-colors cursor-none">Node.js</span>
+                
+                <span class="px-4 py-1.5 rounded-full border border-white/5 text-gray-500 text-sm font-mono hover:text-primary hover:border-primary/50 transition-colors">Figma</span>
+                <span class="px-4 py-1.5 rounded-full border border-white/5 text-gray-500 text-sm font-mono hover:text-primary hover:border-primary/50 transition-colors">Blender</span>
+                <span class="px-4 py-1.5 rounded-full border border-white/5 text-gray-500 text-sm font-mono hover:text-primary hover:border-primary/50 transition-colors">Git</span>
+                <span class="px-4 py-1.5 rounded-full border border-white/5 text-gray-500 text-sm font-mono hover:text-primary hover:border-primary/50 transition-colors">Docker</span>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-8 px-6 border-t border-white/10 relative z-20">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4 bg-[#111] px-4 py-2 rounded border border-white/10 hover:border-primary/30 transition-colors">
+                <div class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-500 font-mono leading-none mb-1">SYSTEM STATUS: ONLINE</span>
+                    <span class="text-xs text-white font-mono leading-none">Learning: <span class="text-primary">Rust Lang</span></span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <a class="text-gray-500 hover:text-primary transition-colors transform hover:-translate-y-1 duration-300" href="#">
+                    <span class="sr-only">GitHub</span>
+                    <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path></svg>
+                </a>
+                <a class="text-gray-500 hover:text-secondary transition-colors transform hover:-translate-y-1 duration-300" href="#">
+                    <span class="sr-only">Twitter</span>
+                    <svg aria-hidden="true" class="h-6 w-6" fill="currentColor" viewbox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+                </a>
+            </div>
+            
+            <div class="text-gray-600 text-[10px] font-mono">
+                © 2025 NEURAL_ARCHITECT // ALL RIGHTS RESERVED
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 1. Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        }
+
+        function toggleContact() {
+            alert("Initialize Communication Protocol: [Opening Mail Client...]");
+            window.location.href = "mailto:hello@nexus.os";
+        }
+
+        // 2. Custom Cursor Follower
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            // Dot follows instantly
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            // Outline follows with slight delay
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        // 3. Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
+
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll', revealOnScroll);
+        // Trigger once on load
+        revealOnScroll();
+
+        // 4. "Hacker" Text Scramble Effect
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+        
+        function startScramble(element) {
+            let iteration = 0;
+            const originalText = element.dataset.value;
+            
+            clearInterval(element.interval);
+            
+            element.interval = setInterval(() => {
+                element.innerText = originalText
+                    .split("")
+                    .map((letter, index) => {
+                        if(index < iteration) {
+                            return originalText[index];
+                        }
+                        return letters[Math.floor(Math.random() * 26)];
+                    })
+                    .join("");
+                
+                if(iteration >= originalText.length){ 
+                    clearInterval(element.interval);
+                }
+                
+                iteration += 1 / 3;
+            }, 30);
+        }
+    </script>
+</body>
+</html>
